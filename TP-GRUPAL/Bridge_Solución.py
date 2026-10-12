@@ -1,5 +1,4 @@
 ########### Solucion al problema de diseño con Bridge ################
-
 from abc import ABC, abstractmethod
 
 # 1. LADO DE LA IMPLEMENTACIÓN (Canales de envío)
@@ -7,21 +6,21 @@ class CanalEnvio(ABC):
     """Interfaz del Implementador: define las operaciones de bajo nivel."""
 
     @abstractmethod
-    def enviar_mensaje(self, cuerpo: str):
+    def enviar_mensaje(self, texto: str):
         pass
 
 
 class Email(CanalEnvio):
-    def enviar_mensaje(self, cuerpo: str):
-        print(f"[EMAIL] Conectando a servidor SMTP... Enviando: {cuerpo}")
+    def enviar_mensaje(self, texto: str):
+        print(f"[EMAIL] Conectando a servidor SMTP... Enviando: {texto}")
 
 class SMS(CanalEnvio):
-    def enviar_mensaje(self, cuerpo: str):
-        print(f"[SMS] Conectando a Gateway GSM... Enviando: {cuerpo}")
+    def enviar_mensaje(self, texto: str):
+        print(f"[SMS] Conectando a Gateway GSM... Enviando: {texto}")
 
 class WhatsApp(CanalEnvio):
-    def enviar_mensaje(self, cuerpo: str):
-        print(f"[WHATSAPP] Conectando a API de Meta... Enviando: {cuerpo}")
+    def enviar_mensaje(self, texto: str):
+        print(f"[WHATSAPP] Conectando a API de Meta... Enviando: {texto}")
 
 
 # 2. LADO DE LA ABSTRACCIÓN (Lógica de negocio/ Tipos de Notificación)
@@ -33,21 +32,21 @@ class Notificacion(ABC):
         self._canal = canal  # EL PUENTE (Composición/Asociación)
 
     @abstractmethod
-    def enviar(self, contenido: str):
+    def enviar(self, mensaje: str):
         pass
 
 class NotificacionUrgente(Notificacion):
-    def enviar(self, contenido: str):
-        mensaje_formateado = f" [ATENCIÓN URGENTE]: {contenido}"
+    def enviar(self, mensaje: str):
+        texto_formateado = f" [ATENCIÓN URGENTE]: {mensaje}"
         # Delega hacia el implementador a través del puente
-        self._canal.enviar_mensaje(mensaje_formateado)
+        self._canal.enviar_texto(texto_formateado)
 
 
 class NotificacionPromocional(Notificacion):
-    def enviar(self, contenido: str):
-        mensaje_formateado = f" ¡OFERTA ESPECIAL!: {contenido} "
+    def enviar(self, mensaje: str):
+        texto_formateado = f" ¡OFERTA ESPECIAL!: {mensaje} "
         # Delega hacia el implementador a través del puente
-        self._canal.enviar_mensaje(mensaje_formateado)
+        self._canal.enviar_texto(texto_formateado)
 
 
 # =====================================================================
@@ -71,7 +70,9 @@ if __name__ == "__main__":
     campana_marketing.enviar("50% de descuento en todos los cursos.")
 
 
+
 # Diferencias clave respecto a la versión sin Bridge:Cero código duplicado: 
 #     La lógica de conexión SMTP o la API de WhatsApp está encapsulada en una única clase (EmailCanal, WhatsAppCanal).
 #     Reducción de clases: En lugar de 6 clases combinadas rígidas, ahora tenemos 5 clases (2 notificaciones + 3 canales). Si agregamos un canal nuevo (Push), solo creamos 1 clase (PushCanal).
 #     Intercambio dinámico: Gracias al método set_canal(), el cliente puede cambiar el medio de transporte en tiempo de ejecución sin cambiar el tipo de mensaje
+
